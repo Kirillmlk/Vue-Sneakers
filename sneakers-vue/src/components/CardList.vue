@@ -10,7 +10,9 @@ const onClickAdd = () => {
         <Card title="Мужские кроссовки Nike"
               image-url="/sneakers/sneakers-1.jpg"
               :price="5000"
+              :is-favorite="false"
               :on-click-add="onClickAdd"
+              :is-added="true"
         />
     </div>
 </template>
