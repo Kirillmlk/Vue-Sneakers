@@ -8,7 +8,7 @@ import Drawer from "@/components/Drawer.vue";
 const items = ref([]);
 
 const filters = reactive({
-    sortBy: '',
+    sortBy: 'title',
     searchQuery: '',
 })
 
@@ -16,29 +16,36 @@ const onChangeSelect = event => {
     filters.sortBy = event.target.value;
 }
 
-onMounted(async () => {
+const onChangeSearchInput = event => {
+    filters.searchQuery = event.target.value;
+}
+const fetchItems = async () => {
     try {
-        const { data } = await axios.get('https://604781a0efa572c1.mokky.dev/items')
-        items.value = data
-        console.log(data)
-    } catch (error) {
-        console.log(error)
-    }
-});
+        const params = {
+            sortBy: filters.sortBy
+        };
 
-watch(filters, async () => {
-    try {
-        const { data } = await axios.get('https://604781a0efa572c1.mokky.dev/items?sortBy=' + filters.sortBy)
+        if (filters.searchQuery) {
+            params.title = `*${filters.searchQuery}*`
+        }
+
+        const {data} = await axios.get(
+            `https://604781a0efa572c1.mokky.dev/items`, {
+                params
+            })
         items.value = data
         console.log(data)
     } catch (error) {
         console.log(error)
     }
-});
+}
+
+onMounted(fetchItems);
+watch(filters, fetchItems);
 </script>
 
 <template>
-<!--        <Drawer></Drawer>-->
+    <!--        <Drawer></Drawer>-->
     <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
         <Header></Header>
         <div class="p-10">
@@ -53,8 +60,9 @@ watch(filters, async () => {
                     <div class="relative">
                         <img class="absolute left-4 top-3" src="/search.svg" alt="search">
                         <input placeholder="Поиск..."
+                               @change="onChangeSearchInput"
                                class="border rounded-md py-2 pl-11 pr-4 outline-none
-                                focus:border-gray-400"
+                               focus:border-gray-400"
                                type="text"
                         />
                     </div>
