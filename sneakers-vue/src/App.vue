@@ -19,6 +19,28 @@ const onChangeSelect = event => {
 const onChangeSearchInput = event => {
     filters.searchQuery = event.target.value;
 }
+
+const fetchFavorites = async () => {
+    try {
+        const {data: favorites} = await axios.get(
+            `https://604781a0efa572c1.mokky.dev/favorites`)
+        items.value = items.value.map(item => {
+            const favorite = favorites.find((favorite) => favorite.productId === item.id);
+
+            if (!favorite) {
+                return item;
+            }
+
+            return {
+                ...item,
+                isFavorite: true,
+                favoriteId: favorite.id,
+            };
+        });
+    } catch (error) {
+        console.log(error)
+    }
+}
 const fetchItems = async () => {
     try {
         const params = {
@@ -33,14 +55,21 @@ const fetchItems = async () => {
             `https://604781a0efa572c1.mokky.dev/items`, {
                 params
             })
-        items.value = data
+        items.value = data.map(obj => ({
+            ...obj,
+            isFavorite: false,
+            isAdded: false,
+        }));
         console.log(data)
     } catch (error) {
         console.log(error)
     }
 }
 
-onMounted(fetchItems);
+onMounted(async () => {
+    await fetchItems();
+    await fetchFavorites();
+});
 watch(filters, fetchItems);
 </script>
 

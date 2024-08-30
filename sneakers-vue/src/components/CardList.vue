@@ -20,6 +20,7 @@ defineProps({
             :price="item.price"
             :is-favorite="false"
             :on-click-add="onClickAdd"
+            :isFavorite="item.isFavorite"
         />
     </div>
 </template>
