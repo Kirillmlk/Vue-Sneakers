@@ -12,6 +12,15 @@ const filters = reactive({
     searchQuery: '',
 })
 
+const drawerOpen = ref(false);
+
+const closeDrawer = () => {
+    drawerOpen.value = false
+}
+const openDrawer = () => {
+    drawerOpen.value = true
+}
+
 const onChangeSelect = event => {
     filters.sortBy = event.target.value;
 }
@@ -98,13 +107,16 @@ onMounted(async () => {
 });
 watch(filters, fetchItems);
 
-// provide('addToFavorite', addToFavorite);
+provide('cartActions', {
+    closeDrawer,
+    openDrawer
+});
 </script>
 
 <template>
-    <!--        <Drawer></Drawer>-->
+    <Drawer v-if="drawerOpen"></Drawer>
     <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-        <Header></Header>
+        <Header @open-drawer="openDrawer"></Header>
         <div class="p-10">
             <div class="flex justify-between items-center">
                 <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
@@ -126,7 +138,7 @@ watch(filters, fetchItems);
                 </div>
             </div>
             <div class="mt-10">
-                <CardList :items="items" @addToFavorite="addToFavorite"></CardList>
+                <CardList :items="items" @add-to-favorite="addToFavorite"></CardList>
             </div>
         </div>
     </div>
