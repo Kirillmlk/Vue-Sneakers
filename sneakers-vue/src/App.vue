@@ -1,12 +1,21 @@
 <script setup>
-import {onMounted, reactive, provide, ref, watch} from "vue";
+import {onMounted, reactive, provide, ref, watch, computed} from "vue";
 import axios from "axios";
 import Header from "@/components/Header.vue";
 import CardList from "@/components/CardList.vue";
 import Drawer from "@/components/Drawer.vue";
+import {comment} from "postcss";
 
 const items = ref([]);
 const cart = ref([]);
+
+const drawerOpen = ref(false);
+
+const totalPrice = computed(
+    () => cart.value.reduce((acc, item) => acc + item.price, 0)
+);
+
+const vatPrice = computed(() => Math.round((totalPrice.value * 5) / 100));
 
 const filters = reactive({
     sortBy: 'title',
@@ -28,9 +37,7 @@ const onClickAddPlus = (item) => {
     } else {
         removeFromCart(item);
     }
- }
-
-const drawerOpen = ref(false);
+}
 
 const closeDrawer = () => {
     drawerOpen.value = false
@@ -135,9 +142,9 @@ provide('cart', {
 </script>
 
 <template>
-    <Drawer v-if="drawerOpen"></Drawer>
+    <Drawer v-if="drawerOpen" :total-price="totalPrice" :vat-price="vatPrice"></Drawer>
     <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-        <Header @open-drawer="openDrawer"></Header>
+        <Header :total-price="totalPrice" @open-drawer="openDrawer"></Header>
         <div class="p-10">
             <div class="flex justify-between items-center">
                 <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
